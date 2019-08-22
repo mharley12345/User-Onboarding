@@ -1,5 +1,5 @@
-import React from "react";
-import {Formik, Form, Field,withFormik} from "formik";
+import React,{useState} from "react";
+import {Form, Field,withFormik} from "formik";
 import * as Yup from 'yup';
 import axios from  'axios'
 
@@ -48,7 +48,7 @@ const FormikOnBoardForm = withFormik({
       name: Yup.string().required("Put Yo!!! Name In Man!!!!!"),
       password: Yup.string().min(6,"6 or more fool").required("Really?"),
       email: Yup.string().email("Wrong,Wrong").required("You need to get it right"),
-      tos: Yup.required("You Must Accept")
+
    
 
   }),
