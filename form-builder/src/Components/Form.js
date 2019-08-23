@@ -1,16 +1,26 @@
-import React,{useState} from "react";
+import  React,{useEffect,useState} from "react";
 import {Form, Field,withFormik} from "formik";
 import * as Yup from 'yup';
 import axios from  'axios'
 
-function FormBuilder({values,errors,touched}) {
-    
-  return (
-   
+function FormBuilder({value,errors,touched,status}) {
+  const[user,setUser] =useState([])
+ 
+  useEffect(() => {
+  if (status) {
+    setUser([...user, status ])
+  }
+
+  }, [status]);
+
+
+ return (
+   <div className="">
+
     <Form>
      <div> 
      {touched.name && errors.name && <p>{errors.name}</p>}  
-      <Field type="text" name="name" placeholder="name"/>
+      <Field type="text" name="username" placeholder="Username"/>
   
   </div>
   <div>
@@ -24,19 +34,38 @@ function FormBuilder({values,errors,touched}) {
  
       </div>
       <label>
-      <Field type="checkbox" name="tos" checked={values.tos}/>
+      <Field type="checkbox" name="tos"  checked={value}/>
       Accept TOS
       </label>
+      <br/>
       <button type="submit" >Submit!</button>
     </Form>
   
-    
-  );
-}
+  
+  
+    {user.map(eachUser => (
+      
+        <p key={eachUser.id}>
+          Username: {eachUser.username} <br />
+          Email: {eachUser.email}<br />
+          TOS: {eachUser.tos}<br/>
+          ID:{eachUser.id}
+         
+        </p>
+        
+  ))}
+      
+      </div>
+ )
+};
+  
+
+
+
 const FormikOnBoardForm = withFormik({
-  mapPropsToValues({name,password,email,tos}){
+  mapPropsToValues({username,password,email,tos}){
       return{
-          name:name || "",
+          username:username || "",
           password:password || "",
           email:email || "",
           tos:tos || false
@@ -45,31 +74,30 @@ const FormikOnBoardForm = withFormik({
   }, 
 
     validationSchema: Yup.object().shape({
-      name: Yup.string().required("Put Yo!!! Name In Man!!!!!"),
+      username: Yup.string().required("Put Yo!!! Name In Man!!!!!"),
       password: Yup.string().min(6,"6 or more fool").required("Really?"),
       email: Yup.string().email("Wrong,Wrong").required("You need to get it right"),
-
+   
    
 
   }),
-  handleSubmit(values, { resetForm, setErrors, setSubmitting }) {
-    if (values.email === "info@mike-harley.me") {
-      setErrors({ email: "That email is already taken" });
-    } else {
+  handleSubmit(values,  {setError,resetForm, setStatus }) {
+     
       axios
         .post("https://reqres.in/api/users", values)
         .then(res => {
-          console.log(res); // Data was created successfully and logs to console
-          resetForm();
-          setSubmitting(false);
+          setStatus(res.data)
+          resetForm()
+          console.log("Server says",res.data)
         })
         .catch(err => {
-          console.log(err); // There was an error creating the data and logs to console
-          setSubmitting(false);
-        });
+          setError(err)
+          console.log("You messed Up,",err); // There was an error creating the data and logs to console
+        })
 
-    }
+    
   }
 })(FormBuilder);
+
 
 export default FormikOnBoardForm
